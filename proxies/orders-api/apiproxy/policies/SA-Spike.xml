@@ -1,0 +1,5 @@
+<SpikeArrest continueOnError="false" enabled="true" name="SA-Spike">
+  <DisplayName>SA-Spike</DisplayName>
+  <Identifier ref="request.header.x-client-id"/>
+  <Rate>30ps</Rate>
+</SpikeArrest>

@@ -1,0 +1,13 @@
+<ResponseCache continueOnError="false" enabled="true" name="RC-Orders">
+  <DisplayName>RC-Orders</DisplayName>
+  <CacheKey>
+    <Prefix>orders</Prefix>
+    <KeyFragment ref="proxy.pathsuffix" type="string"/>
+  </CacheKey>
+  <Scope>Exclusive</Scope>
+  <ExpirySettings>
+    <TimeoutInSeconds ref="config.cache.ttl">60</TimeoutInSeconds>
+  </ExpirySettings>
+  <ExcludeErrorResponse>true</ExcludeErrorResponse>
+  <SkipCacheLookup>request.header.cache-control = "no-cache"</SkipCacheLookup>
+</ResponseCache>

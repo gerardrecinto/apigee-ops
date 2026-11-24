@@ -1,0 +1,10 @@
+<MessageLogging continueOnError="true" enabled="true" name="ML-Splunk">
+  <DisplayName>ML-Splunk</DisplayName>
+  <Syslog>
+    <Message>{"ts":{system.timestamp},"proxy":"{apiproxy.name}","verb":"{request.verb}","path":"{proxy.pathsuffix}","status":{response.status.code},"latency_ms":{log.latency_ms}}</Message>
+    <Host>splunk-syslog.example.internal</Host>
+    <Port>514</Port>
+    <Protocol>TCP</Protocol>
+    <FormatMessage>true</FormatMessage>
+  </Syslog>
+</MessageLogging>

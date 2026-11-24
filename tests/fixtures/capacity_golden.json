@@ -1,0 +1,18 @@
+{
+  "capacity_tps": 100,
+  "days_to_threshold": 7.1,
+  "growth_tps_per_day": 0.989,
+  "headroom_pct": 25.5,
+  "peak_total_tps": 74.49,
+  "proxies": {
+    "oauth-token": {
+      "peak_tps": 9.09,
+      "worst_p99_ms": 139.4
+    },
+    "orders-api": {
+      "peak_tps": 65.4,
+      "worst_p99_ms": 259.7
+    }
+  },
+  "threshold": 0.8
+}

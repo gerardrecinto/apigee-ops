@@ -1,0 +1,111 @@
+# Azure DevOps pipeline for the Apigee proxies in this repo.
+# Validate and Package run on every change. Deploy runs on main only and waits on the
+# approval set on the "apigee-test" and "apigee-prod" Azure DevOps environments.
+trigger:
+  branches:
+    include: [main]
+pr:
+  branches:
+    include: [main]
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  apigeeOrg: my-gcp-project   # replace with your Apigee organization id
+
+stages:
+  - stage: Validate
+    jobs:
+      - job: lint_and_test
+        steps:
+          - task: NodeTool@0
+            inputs: { versionSpec: "22.x" }
+          - script: |
+              set -euo pipefail
+              for p in orders-api oauth-token; do
+                npx --yes apigeelint -s proxies/$p/apiproxy -f table.js
+              done
+            displayName: Lint proxy bundles
+          - task: UsePythonVersion@0
+            inputs: { versionSpec: "3.12" }
+          - script: |
+              set -euo pipefail
+              pip install -e ".[dev]"
+              pytest -q
+            displayName: Unit tests
+          - script: |
+              set -euo pipefail
+              cd terraform
+              terraform init -backend=false -input=false
+              terraform fmt -check -recursive
+              terraform validate
+            displayName: Terraform validate
+
+  - stage: Package
+    dependsOn: Validate
+    jobs:
+      - job: package
+        steps:
+          - script: |
+              set -euo pipefail
+              pip install -e .
+              mkdir -p $(Build.ArtifactStagingDirectory)
+              for p in orders-api oauth-token; do
+                python - <<PY
+              from pathlib import Path
+              from apigee_ops.bundle import package, sha256
+              data = package(Path("proxies/$p"))
+              Path("$(Build.ArtifactStagingDirectory)/$p.zip").write_bytes(data)
+              print("$p", sha256(data))
+              PY
+              done
+            displayName: Build reproducible bundles
+          - publish: $(Build.ArtifactStagingDirectory)
+            artifact: bundles
+
+  - stage: DeployTest
+    dependsOn: Package
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    jobs:
+      - deployment: deploy_test
+        environment: apigee-test
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - task: AzureCLI@2
+                  inputs:
+                    azureSubscription: apigee-deployer   # service connection with workload identity to GCP
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    inlineScript: |
+                      set -euo pipefail
+                      pip install -e .
+                      for p in orders-api oauth-token; do
+                        python -m apigee_ops.deploy --org $(apigeeOrg) --env test --proxy-dir proxies/$p --apply
+                      done
+
+  - stage: DeployProd
+    dependsOn: DeployTest
+    condition: succeeded()
+    jobs:
+      - deployment: deploy_prod
+        environment: apigee-prod
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - task: AzureCLI@2
+                  inputs:
+                    azureSubscription: apigee-deployer
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    inlineScript: |
+                      set -euo pipefail
+                      pip install -e .
+                      for p in orders-api oauth-token; do
+                        python -m apigee_ops.deploy --org $(apigeeOrg) --env prod --proxy-dir proxies/$p --apply
+                      done

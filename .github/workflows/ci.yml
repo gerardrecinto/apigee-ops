@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  proxies:
+    name: Lint proxy bundles
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: |
+          set -euo pipefail
+          for p in proxies/*/; do
+            npx --yes apigeelint -s "${p}apiproxy" -f table.js
+          done
+
+  python:
+    name: Python tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[dev]"
+      - run: pytest -q
+      - name: Sample reports run end to end
+        run: |
+          python -m apigee_ops.logreport data/sample_gateway.log
+          python -m apigee_ops.capacity data/sample_analytics.csv --capacity-tps 100 || test $? -eq 1
+
+  terraform:
+    name: Terraform validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.8"
+      - run: |
+          cd terraform
+          terraform fmt -check -recursive
+          terraform init -backend=false -input=false
+          terraform validate
+
+  site:
+    name: Site matches the Python capacity model
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: node --test site/capacity.test.mjs

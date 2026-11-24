@@ -1,0 +1,8 @@
+<BasicAuthentication continueOnError="false" enabled="true" name="BA-Decode">
+  <DisplayName>BA-Decode</DisplayName>
+  <Operation>Decode</Operation>
+  <IgnoreUnresolvedVariables>false</IgnoreUnresolvedVariables>
+  <User ref="request.header.username"/>
+  <Password ref="request.header.password"/>
+  <Source>request.header.Authorization</Source>
+</BasicAuthentication>

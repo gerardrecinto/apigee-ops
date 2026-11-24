@@ -1,0 +1,21 @@
+<TargetEndpoint name="default">
+  <Description>Orders backend, resolved through an Apigee target server</Description>
+  <PreFlow name="PreFlow">
+    <Request/>
+    <Response/>
+  </PreFlow>
+  <PostFlow name="PostFlow">
+    <Request/>
+    <Response/>
+  </PostFlow>
+  <HTTPTargetConnection>
+    <LoadBalancer>
+      <Server name="orders-backend"/>
+    </LoadBalancer>
+    <Path>/orders</Path>
+    <Properties>
+      <Property name="io.timeout.millis">10000</Property>
+      <Property name="connect.timeout.millis">3000</Property>
+    </Properties>
+  </HTTPTargetConnection>
+</TargetEndpoint>

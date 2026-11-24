@@ -1,0 +1,44 @@
+<ProxyEndpoint name="default">
+  <Description>Public entry point for orders-api</Description>
+  <PreFlow name="PreFlow">
+    <Request>
+      <Step><Name>SA-Spike</Name></Step>
+      <Step><Name>JWT-Verify</Name></Step>
+      <Step><Name>KVM-Config</Name></Step>
+    </Request>
+    <Response/>
+  </PreFlow>
+  <Flows>
+    <Flow name="get-order">
+      <Description>GET /orders/{id}</Description>
+      <Request>
+        <Step><Name>RC-Orders</Name></Step>
+      </Request>
+      <Response>
+        <Step><Name>X2J-Order</Name></Step>
+        <Step><Name>RC-Orders</Name></Step>
+      </Response>
+      <Condition>(proxy.pathsuffix MatchesPath "/orders/*") and (request.verb = "GET")</Condition>
+    </Flow>
+    <Flow name="unknown-request">
+      <Description>Anything else is a 404</Description>
+      <Request>
+        <Step><Name>RF-NotFound</Name></Step>
+      </Request>
+      <Response/>
+    </Flow>
+  </Flows>
+  <PostFlow name="PostFlow">
+    <Request/>
+    <Response>
+      <Step><Name>JS-Latency</Name></Step>
+      <Step><Name>ML-Splunk</Name></Step>
+    </Response>
+  </PostFlow>
+  <HTTPProxyConnection>
+    <BasePath>/v1/orders</BasePath>
+  </HTTPProxyConnection>
+  <RouteRule name="default">
+    <TargetEndpoint>default</TargetEndpoint>
+  </RouteRule>
+</ProxyEndpoint>

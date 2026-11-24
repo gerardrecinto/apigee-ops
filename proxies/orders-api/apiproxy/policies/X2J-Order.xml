@@ -1,0 +1,9 @@
+<XMLToJSON continueOnError="false" enabled="true" name="X2J-Order">
+  <DisplayName>X2J-Order</DisplayName>
+  <Options>
+    <RecognizeNumber>true</RecognizeNumber>
+    <RecognizeBoolean>true</RecognizeBoolean>
+  </Options>
+  <OutputVariable>response</OutputVariable>
+  <Source>response</Source>
+</XMLToJSON>

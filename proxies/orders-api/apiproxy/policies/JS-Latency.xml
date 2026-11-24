@@ -1,0 +1,4 @@
+<Javascript continueOnError="true" enabled="true" timeLimit="200" name="JS-Latency">
+  <DisplayName>JS-Latency</DisplayName>
+  <ResourceURL>jsc://latency.js</ResourceURL>
+</Javascript>

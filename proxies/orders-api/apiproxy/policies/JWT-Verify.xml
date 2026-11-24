@@ -1,0 +1,11 @@
+<VerifyJWT continueOnError="false" enabled="true" name="JWT-Verify">
+  <DisplayName>JWT-Verify</DisplayName>
+  <Algorithm>RS256</Algorithm>
+  <Source>request.header.authorization</Source>
+  <PublicKey>
+    <JWKS uri="https://login.example.com/.well-known/jwks.json"/>
+  </PublicKey>
+  <Issuer>https://login.example.com/</Issuer>
+  <Audience>orders-api</Audience>
+  <IgnoreUnresolvedVariables>false</IgnoreUnresolvedVariables>
+</VerifyJWT>

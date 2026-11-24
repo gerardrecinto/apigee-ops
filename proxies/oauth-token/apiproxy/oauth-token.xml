@@ -1,0 +1,4 @@
+<APIProxy revision="1" name="oauth-token">
+  <DisplayName>oauth-token</DisplayName>
+  <Description>OAuth 2.0 client credentials token endpoint. Clients authenticate with HTTP Basic.</Description>
+</APIProxy>

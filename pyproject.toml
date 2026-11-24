@@ -1,0 +1,17 @@
+[project]
+name = "apigee-ops"
+version = "0.1.0"
+description = "Apigee X operations tooling: cert renewal into Secret Manager, capacity planning, Splunk log reports, bundle packaging and deploy."
+requires-python = ">=3.11"
+dependencies = ["cryptography>=42"]
+
+[project.optional-dependencies]
+gcp = ["google-cloud-secret-manager>=2.20"]
+dev = ["pytest>=8", "pyyaml>=6"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
