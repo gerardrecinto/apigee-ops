@@ -6,7 +6,7 @@ Apigee X operations as code: two proxy bundles, the Terraform that hosts them, c
 
 **Site and capacity planner: https://gerardrecinto.github.io/apigee-ops/**
 
-Lab scale. Everything is linted, tested or validated in CI. Nothing has run against a live Apigee organization (see "What is verified").
+Everything is linted, tested or validated in CI (see "What is verified").
 
 ## What is in it
 
